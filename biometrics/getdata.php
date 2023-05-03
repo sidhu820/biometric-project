@@ -1,3 +1,7 @@
+<?php
+//evide session thudaggunnu😊👌
+session_start();
+?>
 <?php  
 //Connect to database
 require 'connectDB.php';
@@ -35,11 +39,7 @@ if (isset($_POST['FingerID'])) {
                     //*****************************************************
                     //Login
                     if (!$row = mysqli_fetch_assoc($resultl)){
-                        
-                        $qry="SELECT sub FROM curntlogn";
-                        $result = $conn->query($qry);
-                        $row = $result->fetch_assoc();
-                        $sub=$row["sub"];
+                        $sub=$_SESSION["sub"];
 
                     	$sql = "INSERT INTO users_logs (username, sub, serialnumber, fingerprint_id, checkindate, timein, timeout) VALUES (? ,?, ?, CURDATE(), CURTIME(), ?)";
                         $result = mysqli_stmt_init($conn);
