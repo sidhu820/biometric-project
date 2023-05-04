@@ -1,10 +1,11 @@
 <?php
-//evide session thudaggunnu😊👌
 session_start();
 ?>
 <?php  
 //Connect to database
 require 'connectDB.php';
+//echo isset($_SESSION['sub']);
+$reply = 'nope';
 
 if (isset($_POST['FingerID'])) {
 	
@@ -37,11 +38,15 @@ if (isset($_POST['FingerID'])) {
                     mysqli_stmt_execute($result);
                     $resultl = mysqli_stmt_get_result($result);
                     //*****************************************************
-                    //Login
+                    //Login check in
                     if (!$row = mysqli_fetch_assoc($resultl)){
-                        $sub=$_SESSION["sub"];
+                        if(isset($_SESSION['sub'])){
+                            $sub = $_SESSION['sub'];
+                        }else{
+                            $sub = 'undefined';
+                        }
 
-                    	$sql = "INSERT INTO users_logs (username, sub, serialnumber, fingerprint_id, checkindate, timein, timeout) VALUES (? ,?, ?, CURDATE(), CURTIME(), ?)";
+                    	$sql = "INSERT INTO users_logs (username, sub, serialnumber, fingerprint_id, checkindate, timein, timeout) VALUES (? ,?, ?, ?, CURDATE(), CURTIME(), ?)";
                         $result = mysqli_stmt_init($conn);
                         if (!mysqli_stmt_prepare($result, $sql)) {
                             echo "SQL_Error_Select_login1";
@@ -49,7 +54,7 @@ if (isset($_POST['FingerID'])) {
                         }
                         else{
                         	$timeout = "";
-                            mysqli_stmt_bind_param($result, "sdis", $Uname, $Number, $fingerID, $timeout);
+                            mysqli_stmt_bind_param($result, "ssdis", $Uname,$sub, $Number, $fingerID, $timeout);
                             mysqli_stmt_execute($result);
 
                             echo "login".$Uname;
@@ -57,9 +62,9 @@ if (isset($_POST['FingerID'])) {
                         }
                     }
                     //*****************************************************
-                    //Logout
+                    //Logout checkout
                     else{
-                    	$sql="UPDATE users_logs SET timeout=CURTIME() WHERE fingerprint_id=? AND checkindate=CURDATE()";
+                    	$sql="UPDATE users_logs SET timeout=CURTIME() WHERE fingerprint_id=? AND checkindate=CURDATE() AND timeout=0";
                         $result = mysqli_stmt_init($conn);
                         if (!mysqli_stmt_prepare($result, $sql)) {
                             echo "SQL_Error_insert_logout1";
@@ -244,7 +249,39 @@ if (!empty($_POST['confirm_id'])) {
         }
     }  
 }
+//select (select count(*) from `users`) - (select count(del_fingerid) from `users` WHERE del_fingerid=1) diff from dual;
 if (isset($_POST['DeleteID'])) {
+    if($_POST['DeleteID'] == "ALL"){
+        $sql = "select (select count(*) from `users`) - (select count(del_fingerid) from `users` WHERE del_fingerid=1) diff from dual;";
+        $result = mysqli_stmt_init($conn);
+        if (!mysqli_stmt_prepare($result, $sql)) {
+            echo "SQL_Error_Select";
+            exit();
+        }
+        else{
+            mysqli_stmt_execute($result);
+            $resultl = mysqli_stmt_get_result($result);
+            if ($row = mysqli_fetch_assoc($resultl)) {
+                
+                echo "dal-id".$row['diff']; //send to nodemcu
+
+                $sql = "DELETE FROM users WHERE del_fingerid=1 AND fingerprint_id !=0";
+                $result = mysqli_stmt_init($conn);
+                if (!mysqli_stmt_prepare($result, $sql)) {
+                    echo "SQL_Error_delete";
+                    exit();
+                }
+                else{
+                    mysqli_stmt_execute($result);
+                    exit();
+                }
+            }
+            else{
+                echo "nothing";
+                exit();
+            }
+        }
+    }
 
 	if ($_POST['DeleteID'] == "check") {
         $sql = "SELECT fingerprint_id FROM users WHERE del_fingerid=1";
@@ -258,9 +295,9 @@ if (isset($_POST['DeleteID'])) {
             $resultl = mysqli_stmt_get_result($result);
             if ($row = mysqli_fetch_assoc($resultl)) {
                 
-                echo "del-id".$row['fingerprint_id'];
+                echo "del-id".$row['fingerprint_id']; //send to nodemcu
 
-                $sql = "DELETE FROM users WHERE del_fingerid=1";
+                $sql = "DELETE FROM users WHERE del_fingerid=1  AND fingerprint_id !=0";
                 $result = mysqli_stmt_init($conn);
                 if (!mysqli_stmt_prepare($result, $sql)) {
                     echo "SQL_Error_delete";

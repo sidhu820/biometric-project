@@ -297,9 +297,22 @@ if (isset($_POST['Update'])) {
         }
     }
 }
+//set del all
+if(isset($_POST['delALL'])){
+    $sql="UPDATE users SET  del_fingerid=1 where fingerprint_id !=0";
+    $result = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($result, $sql)) {
+        echo "SQL_Error_delete";
+        exit();
+    }
+    else{
+        mysqli_stmt_execute($result);
+        echo "All Fingerprint has been deleted";
+        exit();
+    }
+}
 // delete user 
 if (isset($_POST['delete'])) {
-
     $sql = "SELECT fingerprint_select FROM users WHERE fingerprint_select=1";
     $result = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($result, $sql)) {

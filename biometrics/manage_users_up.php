@@ -4,7 +4,7 @@
   //Connect to database
   require'connectDB.php';
 
-    $sql = "SELECT * FROM users WHERE del_fingerid=0 ORDER BY fingerprint_id";
+    $sql = "SELECT * FROM users WHERE del_fingerid=0 AND fingerprint_id != 0 ORDER BY fingerprint_id DESC";
     $result = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($result, $sql)) {
         echo '<p class="error">SQL Error</p>';
@@ -37,6 +37,7 @@
         }   
     }
   }
+  echo "</tbody>";
+  echo "</table>";
 ?>
-</tbody>
-</table>
+

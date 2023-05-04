@@ -5,9 +5,9 @@
       session_start();
       //Connect to database
       require'connectDB.php';
-      foreach ($_POST as $key => $value) {
-        echo "Field ".htmlspecialchars($key)." is ".htmlspecialchars($value)."<br>";
-    }
+    //   foreach ($_POST as $key => $value) {
+    //     echo "Field ".htmlspecialchars($key)." is ".htmlspecialchars($value)."<br>";
+    // }
       if (isset($_POST['log_date'])) {
         if ($_POST['date_sel'] != 0) {
             $_SESSION['seldate'] = $_POST['date_sel'];
@@ -23,8 +23,20 @@
       else if ($_POST['select_date'] == 0) {
           $seldate = $_SESSION['seldate'];
       }
+      
 
-      $sql = "SELECT * FROM users_logs WHERE checkindate='$seldate' ORDER BY id DESC";
+ $sql="UPDATE users_logs SET sub=? WHERE checkindate='$seldate' AND sub='undefined'";
+                   $result = mysqli_stmt_init($conn);
+                   if (!mysqli_stmt_prepare($result, $sql)) {
+                       echo "SQL_Error_insert_logout1";
+                       exit();
+                   }
+                   else{
+                       mysqli_stmt_bind_param($result, "s", $_SESSION['sub']);
+                       mysqli_stmt_execute($result);
+                   }
+
+     $sql = "SELECT * FROM users_logs WHERE checkindate='$seldate' ORDER BY id";
       $result = mysqli_stmt_init($conn);
       if (!mysqli_stmt_prepare($result, $sql)) {
           echo '<p class="error">SQL Error</p>';
@@ -38,6 +50,7 @@
                   <TR>
                   <TD><?php echo $row['id'];?></TD>
                   <TD><?php echo $row['username'];?></TD>
+                  <TD><?php echo $row['sub'];?></TD>
                   <TD><?php echo $row['serialnumber'];?></TD>
                   <TD><?php echo $row['fingerprint_id'];?></TD>
                   <TD><?php echo $row['checkindate'];?></TD>

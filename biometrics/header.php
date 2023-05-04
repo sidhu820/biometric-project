@@ -26,7 +26,7 @@ if(!$_SESSION['user']){
 		<a href="ManageUsers.php">Manage Users</a>
 	</div>
 	<div class="list-rt">
-		<a href="logout.php">Log Out <?php echo $_SESSION['user'];  ?></a>
+		<a href="logout.php">Log Out <?php echo $_SESSION['user']." | ".$_SESSION['sub'];  ?></a>
 	</div>
     <a href="javascript:void(0);" class="icon" onclick="navFunction()">
 	  <i class="fa fa-bars"></i></a>

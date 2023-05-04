@@ -21,6 +21,7 @@
         url: "manage_users_up.php"
         }).done(function(data) {
         $('#manage_users').html(data);
+		inc();
       });
     setInterval(function(){
       $.ajax({
@@ -28,8 +29,32 @@
         }).done(function(data) {
         $('#manage_users').html(data);
       });
+	  inc();
     },5000);
   });
+
+  //delete all
+  $(document).on('click', '.button-82-pushable', function(){
+    console.log("pushed")
+  	$.ajax({
+  	  url: 'manage_users_conf.php',
+  	  type: 'POST',
+  	  data: {
+    	'delALL': 'ALL',
+      },
+      success: function(response){
+        
+      }
+  	});
+  });
+  function inc(){
+	let myTable = document.getElementById('manage_users');
+	let cells = myTable.querySelectorAll('td');
+	let next = parseInt(cells[2].innerText) || 1;
+	let d =  document.querySelector('#fingerid');
+	d.value = next+2;
+  }
+  
 </script>
 </head>
 <body>
@@ -68,7 +93,16 @@
 			<button type="button" name="user_rmo" class="user_rmo">Remove User</button>
 		</form>
 	</div>
+  	<div class="controls">
+	  <button class="button-82-pushable" role="button">
+  <span class="button-82-shadow"></span>
+  <span class="button-82-edge"></span>
+  <span class="button-82-front text">
+    DELETE ALL
+  </span>
+</button>
 
+	</div>
 	<div class="section">
 	<!--User table-->
 		<div class="tbl-header slideInRight animated">
@@ -88,10 +122,11 @@
 		</div>
 		<div class="tbl-content slideInRight animated">
 		    <table cellpadding="0" cellspacing="0" border="0">
-		      <div id="manage_users"></div>
+		      <div id="manage_users">
+
+			  </div>
 		</div>
 	</div>
-
 </main>
 </body>
 </html>
